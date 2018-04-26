@@ -40,7 +40,7 @@ from twisted.internet.base import IDelayedCall, ThreadedResolver
 from twisted.internet.threads import deferToThreadPool, deferToThread, callMultipleInThread, blockingCallFromThread
 from twisted.persisted import styles
 
-from zope.interface import Interface, implements
+from zope.interface import Interface, implementer
 
 
 __all__ = [
@@ -96,7 +96,7 @@ def waitForDeferred(d,result=None):
 	d.addCallbacks(cb,eb)
 	try:
 		return result.get()
-	except failure.Failure,ex:
+	except failure.Failure as ex:
 		ex.raiseException()
 
 
@@ -184,10 +184,10 @@ class GeventResolver(ThreadedResolver):
 		return userDeferred
 
 
+@implementer(IDelayedCall)
 class DelayedCall(object):
 	"""Delayed call proxy for IReactorTime"""
 
-	implements(IDelayedCall)
 	debug = False
 	_str = None
 
@@ -334,10 +334,9 @@ class Stream(Greenlet,styles.Ephemeral):
 			self.reactor.discardWriter(selectable)
 
 
+@implementer(IReactorGreenlets)
 class GeventReactor(posixbase.PosixReactorBase):
 	"""Implement gevent-powered reactor based on PosixReactorBase."""
-
-	implements(IReactorGreenlets)
 
 	def __init__(self,*args,**kwargs):
 		self.resolver = None
